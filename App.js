@@ -15,21 +15,25 @@ export default function App() {
   
   const [alue, setAlue] = useState(initial);
   const [osoite, setOsoite] = useState('');
-  const[location, setLocation] = useState(null);
 
 
   useEffect(()=> {
-    (async() => {
-      let  { status} = await Location.requestForegroundPermissionsAsync();
+    const fetchLocation = async() => {
+      let  { status } = await Location.requestPermissionsAsync();
       if  (status !== 'granted') {
-      Alert.alert('No permission to get location')
-      return;
+      Alert.alert('No permission to get location');
+      } else {
+        try {
+          let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High});
+          console.log(location)
+          setAlue({ ...alue, latitude: location.coords.latitude, longitude: location.coords.longitude });
+        } catch (error) {
+          console.log(error.message);
+        }
+      }
     }
-    let location = await Location.getCurrentPositionAsync({});
-    setLocation(location);
-    console.log(location);
-  })();
-}, []);
+    fetchLocation();
+  }, []);
   
 
   const haeKoordinaatit = async (osoite) => {
@@ -40,7 +44,7 @@ export default function App() {
       const response = await fetch(url);
       const data = await response.json();
 
-      const {lat, lng} = data.results[0].locations[0].latLng
+      const {lat, lng} = data.results[0].locations[0].latLng;
       console.log(lat, lng);
       setAlue({...alue, latitude: lat, longitude: lng})
 
@@ -60,7 +64,6 @@ export default function App() {
       >
         <Marker
           coordinate={alue}
-          title='Haaga-Helia'
         />
       </MapView>
 
@@ -87,7 +90,7 @@ const styles = StyleSheet.create({
     paddingTop:StatusBar.currentHeight,
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'center',
   },
   map: {
