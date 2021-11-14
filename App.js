@@ -8,8 +8,8 @@ export default function App() {
   const initial = {
     latitude: 60.200692,
     longitude: 24.934302,
-    latitudeDelta: 0.0322,
-    longitudeDelta: 0.0221
+    latitudeDelta: 0.222,
+    longitudeDelta: 0.221
   };
 
   
